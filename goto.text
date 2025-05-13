@@ -1,0 +1,2 @@
+- there may be a situation where you need to add "@repo/db" as "dependencies" and not as "devDependencies" as KIRAT did it.
+- find a way to add './output' folder for generated client for prisma.

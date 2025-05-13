@@ -22,9 +22,7 @@ app.get('/',(req,res)=>{
 
 app.post('/signup',async (req,res)=>{
     try{
-        const user=req.body;
-
-        const parseResult=UserSchema.safeParse(user);
+        const parseResult=UserSchema.safeParse(req.body);
         if(!parseResult.success){
             res.status(400).json({
                 message:'Bad request, invalid input/s.',
@@ -33,6 +31,7 @@ app.post('/signup',async (req,res)=>{
             return;
         }
 
+        const user=parseResult.data;
         const existingUser=await prismaClient.user.findUnique({
             where:{email:user.email}
         })
@@ -53,12 +52,16 @@ app.post('/signup',async (req,res)=>{
             },
             select:{
                 email:true,
-                name:true
+                name:true,
+                id:true
             }
         });
 
         const token=jwt.sign(
-            {email: user.email},
+            {
+                email: newUser.email,
+                id: newUser.id
+            },
             jwtSecret,
             {expiresIn:'1h'}
         )
@@ -66,7 +69,7 @@ app.post('/signup',async (req,res)=>{
         res.cookie('token',token,{
             httpOnly:true,
             secure:false, // for development and testing only
-            sameSite:'strict',
+            sameSite:'lax',
             maxAge:3600000
         })
         res.status(201).json({
@@ -84,9 +87,7 @@ app.post('/signup',async (req,res)=>{
 
 app.post('/signin',async (req,res)=>{
     try{
-        const user=req.body;
-    
-        const parseResult=await SigninSchema.safeParseAsync(user);
+        const parseResult=await SigninSchema.safeParseAsync(req.body);
         if(!parseResult.success){
             res.status(400).json({
                 message:'Bad request, invalid input/s.',
@@ -94,13 +95,15 @@ app.post('/signin',async (req,res)=>{
             })
             return;
         }
-    
+        
+        const user=parseResult.data;
         const existingUser=await prismaClient.user.findUnique({
             where:{email:user.email},
             select:{
                 email:true,
                 name:true,
-                password:true
+                password:true,
+                id:true
             }
         })
         if(!existingUser){
@@ -122,7 +125,10 @@ app.post('/signin',async (req,res)=>{
         }
 
         const token=jwt.sign(
-            {email:user.email},
+            {
+                email:existingUser.email,
+                id:existingUser.id
+            },
             jwtSecret,
             {expiresIn:'1h'}
         )
@@ -130,14 +136,15 @@ app.post('/signin',async (req,res)=>{
         res.cookie('token',token,{
             httpOnly:true,
             secure:false,
-            sameSite:'strict',
+            sameSite:'lax',
             maxAge:3600000
         })
         res.status(200).json({
             message:'user signed in',
             user:{
                 email:existingUser.email,
-                name:existingUser.name
+                name:existingUser.name,
+                id:existingUser.id
             }
         })
     }
@@ -149,7 +156,7 @@ app.post('/signin',async (req,res)=>{
     }
 })
 
-app.post('/create-room',middleware,async (req:CustomRequest,res)=>{
+app.post('/room',middleware,async (req:CustomRequest,res)=>{
     try{
         const {roomName}=req.body;
         const email=req.email;
@@ -183,6 +190,7 @@ app.post('/create-room',middleware,async (req:CustomRequest,res)=>{
             },
             select:{
                 slug:true,
+                id:true
             }
         });
 
@@ -198,6 +206,65 @@ app.post('/create-room',middleware,async (req:CustomRequest,res)=>{
         res.status(500).json({
             message:'Server error, unable to create room.',
             error: err instanceof Error?err.message:'Unknown error'
+        })
+    }
+})
+
+app.get('/chat/:roomId',middleware,async(req:CustomRequest,res)=>{
+    try {
+        const roomId=Number(req.params.roomId);
+        if(!roomId){
+            res.status(400).json({
+                message:'Bad request, roomId is not present.'
+            })
+            return;
+        }
+
+        const chats=await prismaClient.chat.findMany({
+            where:{
+                roomId,
+            },
+            orderBy:{
+                id:"desc"
+            },
+            take:50
+        })
+
+        res.status(200).json({
+            messages:chats
+        })
+    } 
+    catch (err) {
+        res.status(500).json({
+            message:'Server error while fetching data.',
+            error: err instanceof Error? err.message:'Unknown error'
+        })
+    }
+})
+
+app.get('/room/:slug',middleware,async (req:CustomRequest,res)=>{
+    try{
+        const slug=req.params.slug;
+        if(!slug){
+            res.status(400).json({
+                message:'Bad request, slug is missing.'
+            })
+        }
+
+        const room=await prismaClient.room.findUnique({
+            where:{
+                slug
+            }
+        })
+
+        res.status(200).json({
+            room
+        })
+    }
+    catch(err){
+        res.status(500).json({
+            message:'Server error while getting room details',
+            error: err instanceof Error? err.message:'Unknown error'
         })
     }
 })
