@@ -1,6 +1,10 @@
 {
-  "name": "Excalidraw",
+  "name": "excalidraw",
   "private": true,
+  "workspaces":[
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
@@ -14,7 +18,7 @@
     "turbo": "^2.5.3",
     "typescript": "5.8.2"
   },
-  "packageManager": "pnpm@10.10.0",
+  "packageManager": "pnpm@10.11.0",
   "engines": {
     "node": ">=18"
   }
