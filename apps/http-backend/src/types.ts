@@ -1,9 +1,7 @@
-import {Request,Response} from 'express';
+import { Request, Response } from "express";
 
-interface CustomRequest extends Request{
-    email?:string
+interface CustomRequest extends Request {
+    email?: string;
 }
 
-export type {
-    CustomRequest,
-}
+export type { CustomRequest };

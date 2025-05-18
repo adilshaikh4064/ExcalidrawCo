@@ -11,15 +11,19 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@lottiefiles/dotlottie-react": "^0.13.5",
     "@repo/ui": "workspace:*",
     "@tailwindcss/postcss": "^4.1.6",
+    "@types/ws": "^8.18.1",
     "autoprefixer": "^10.4.21",
+    "axios": "^1.9.0",
     "next": "^15.3.0",
     "postcss": "^8.5.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.56.3",
-    "tailwindcss": "^4.1.6"
+    "tailwindcss": "^4.1.6",
+    "ws": "^8.18.2"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

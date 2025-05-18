@@ -1,29 +1,21 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
 
+@theme {
+    --color-keep-100: #f8f9fa;
+    --color-keep-200: #e9ecef;
+    --color-keep-300: #dee2e6;
+    --color-keep-400: #ced4da;
+    --color-keep-500: #adb5bd;
+    --color-keep-600: #6c757d;
+    --color-keep-700: #495057;
+    --color-keep-800: #343a40;
+    --color-keep-900: #212529;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    --animate-bounce: 
+;
+}
 
 /* :root {
   --background: #ffffff;
