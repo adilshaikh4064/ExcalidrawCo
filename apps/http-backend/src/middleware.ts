@@ -11,11 +11,23 @@ export default function middleware(
     next: NextFunction
 ) {
     // const token=req.cookies.token;
-    const token = req.body.token;
-    if (!token) {
+    const authorization = req.headers.authorization;
+    if (
+        !authorization ||
+        authorization.trim() === "" ||
+        !authorization.includes(" ")
+    ) {
+        res.status(401).json({
+            message: "Bad request, unauthorised",
+            error: "auth header is not valid or missing",
+        });
+        return;
+    }
+    const [scheme, token] = authorization.split(" ");
+    if (scheme !== "Bearer" || !token) {
         res.status(401).json({
             message: "Bad request, unauthorised!",
-            error: "jwt token is missing.",
+            error: "jwt token is missing or scheme('Bearer') is not valid.",
         });
         return;
     }

@@ -74,12 +74,7 @@ wss.on("connection", (ws, request) => {
     }
 
     ws.on("message", async function (data) {
-        let parsedData;
-        if (typeof data !== "string") {
-            parsedData = JSON.parse(data.toString());
-        } else {
-            parsedData = JSON.parse(data);
-        }
+        const parsedData = JSON.parse(data.toString());
 
         if (parsedData.type === "join-room") {
             const user = users.find((user) => user.ws === ws);
@@ -102,7 +97,7 @@ wss.on("connection", (ws, request) => {
                 data: {
                     roomId: Number(roomId),
                     userId: user!.id,
-                    message,
+                    message: JSON.stringify(message),
                 },
             });
 
