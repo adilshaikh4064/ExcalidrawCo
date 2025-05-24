@@ -1,5 +1,9 @@
 import initDraw from "@/app/draw";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import Button from "./Button";
+import { Game } from "@/app/draw/game";
+
+export type Tool = "cir" | "pen" | "rect";
 
 export default function Canvas({
     roomId,
@@ -11,31 +15,73 @@ export default function Canvas({
     const canvasRef = useRef<HTMLCanvasElement>(
         null
     ) as React.RefObject<HTMLCanvasElement>;
+    const [game, setGame] = useState<Game>();
+    const [active, setActive] = useState<Tool>("cir");
+    // const hasInitialised = useRef<boolean>(false);
 
     useEffect(() => {
-        if (!canvasRef.current) return;
-        initDraw(canvasRef, roomId, socket);
+        game?.selectTool(active);
+    }, [active, game]);
+
+    useEffect(() => {
+        // if (hasInitialised.current || !canvasRef.current) return;
+        // alert("canvas is getting created.");
+        // hasInitialised.current = true;
+        // let canvas = canvasRef.current;
+        // initDraw(canvas, roomId, socket);
+        if (canvasRef.current) {
+            const g = new Game(canvasRef.current, roomId, socket);
+            setGame(g);
+
+            return () => {
+                g.destroy();
+            };
+        }
     }, [canvasRef]);
 
     return (
-        <div className="min-w-screen min-h-screen flex justify-center items-center relative">
+        <div className="w-screen h-screen">
             <canvas
                 ref={canvasRef}
-                height={"850px"}
-                width={"1500px"}
-                className="bg-gray-950 border-1 border-red-400/40 drop-shadow-lg drop-shadow-red-400/40 rounded-2xl"
+                height={window.innerHeight}
+                width={window.innerWidth}
+                className="bg-gray-950"
             ></canvas>
-            <div className="w-15 absolute left-0 ml-5 py-5 border border-orange-500 rounded-full shadow-lg shadow-orange-500/50 flex flex-col items-center justify-center gap-2">
-                <button className="border border-cyan-600 px-2 rounded-lg cursor-pointer hover:scale-105 transition-all duration-200 ease-in-out">
-                    ok
-                </button>
-                <button className="border border-cyan-600 px-2 rounded-lg cursor-pointer hover:scale-105 transition-all duration-200 ease-in-out">
-                    ok
-                </button>
-                <button className="border border-cyan-600 px-2 rounded-lg cursor-pointer hover:scale-105 transition-all duration-200 ease-in-out">
-                    ok
-                </button>
-            </div>
+            <TopBar active={active} setActive={setActive} />
+        </div>
+    );
+}
+
+function TopBar({
+    active,
+    setActive,
+}: {
+    active: Tool;
+    setActive: (t: Tool) => void;
+}) {
+    return (
+        <div className="w-15 fixed left-[2%] top-[45%] py-5 border border-orange-500 rounded-full shadow-lg shadow-orange-500/50 flex flex-col items-center justify-center gap-2">
+            <Button
+                name="rect"
+                onclick={() => {
+                    setActive("rect");
+                }}
+                isActive={active === "rect"}
+            />
+            <Button
+                name="pen"
+                onclick={() => {
+                    setActive("pen");
+                }}
+                isActive={active === "pen"}
+            />
+            <Button
+                name="cir"
+                onclick={() => {
+                    setActive("cir");
+                }}
+                isActive={active === "cir"}
+            />
         </div>
     );
 }

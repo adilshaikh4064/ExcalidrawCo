@@ -8,7 +8,7 @@ export default function RoomCanvas({ roomId }: { roomId: string }) {
 
     useEffect(() => {
         const ws = new WebSocket(
-            "ws://localhost:8081/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkaWxAZ21haWwuY29tIiwiaWQiOiI4YmVhYTcyYy0xOGVhLTQ3M2YtOTUxNy0zZDM0YzMyZmZjMjQiLCJpYXQiOjE3NDc5Mzk3MDYsImV4cCI6MTc0Nzk0MzMwNn0.Hp5IzEQr4ilQTEVG1Za5m2SL2GaRANAGDWN0et2CYQA"
+            "ws://localhost:8081/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkaWxAZ21haWwuY29tIiwiaWQiOiI4YmVhYTcyYy0xOGVhLTQ3M2YtOTUxNy0zZDM0YzMyZmZjMjQiLCJpYXQiOjE3NDgwNjA4MDQsImV4cCI6MTc0ODEwNDAwNH0.q-IOQnZAANKg8kv9_O6u1UfkLDC2AEgrytepRjRRdxw"
         ); //FIXME: don't hardcode token
 
         ws.onopen = (e: Event) => {

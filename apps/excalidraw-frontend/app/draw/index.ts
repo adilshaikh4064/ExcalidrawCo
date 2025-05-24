@@ -2,22 +2,18 @@ import axios from "axios";
 
 type Shape =
     | { type: "rect"; x: number; y: number; width: number; height: number }
-    | { type: "circle"; centerX: number; centerY: number; radius: number };
+    | { type: "cir"; centerX: number; centerY: number; radius: number };
 
 export default async function initDraw(
-    canvasRef: React.RefObject<HTMLCanvasElement>,
+    canvas: HTMLCanvasElement,
     roomId: string,
     socket: WebSocket
 ) {
-    const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     ctx.strokeStyle = "#fff";
     let existingShape: Shape[] = await getExistingShapes(roomId);
-    // const getStoredShape = await getExistingShapes(roomId);
-    // if (typeof getStoredShape === "string") return;
-    // existingShape = getStoredShape;
     renderCanvas(ctx, existingShape, canvas);
 
     socket.onmessage = (e: MessageEvent) => {
@@ -50,7 +46,6 @@ export default async function initDraw(
         const pos = getMousePos(e);
         let w = pos.x - startX;
         let h = pos.y - startY;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
         renderCanvas(ctx, existingShape, canvas);
         ctx.strokeRect(startX, startY, w, h);
     };
@@ -128,7 +123,7 @@ async function getExistingShapes(roomId: string) {
     // }
     const response = await axios.get("http://localhost:3001/chat/8", {
         headers: {
-            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkaWxAZ21haWwuY29tIiwiaWQiOiI4YmVhYTcyYy0xOGVhLTQ3M2YtOTUxNy0zZDM0YzMyZmZjMjQiLCJpYXQiOjE3NDc5Mzk3MDYsImV4cCI6MTc0Nzk0MzMwNn0.Hp5IzEQr4ilQTEVG1Za5m2SL2GaRANAGDWN0et2CYQA`,
+            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkaWxAZ21haWwuY29tIiwiaWQiOiI4YmVhYTcyYy0xOGVhLTQ3M2YtOTUxNy0zZDM0YzMyZmZjMjQiLCJpYXQiOjE3NDgwMTI1MjAsImV4cCI6MTc0ODA1NTcyMH0.tVh6jU4wmrZlvurfpz-GuEu4YuqxyRkXcJS6RwGhPi4`,
         },
     });
 

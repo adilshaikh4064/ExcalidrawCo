@@ -70,7 +70,7 @@ app.post("/signup", async (req, res) => {
                 id: newUser.id,
             },
             jwtSecret,
-            { expiresIn: "1h" }
+            { expiresIn: "12h" }
         );
 
         res.cookie("token", token, {
@@ -140,7 +140,7 @@ app.post("/signin", async (req, res) => {
                 id: existingUser.id,
             },
             jwtSecret,
-            { expiresIn: "1h" }
+            { expiresIn: "12h" }
         );
 
         res.cookie("token", token, {

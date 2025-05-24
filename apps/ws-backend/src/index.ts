@@ -79,15 +79,23 @@ wss.on("connection", (ws, request) => {
         if (parsedData.type === "join-room") {
             const user = users.find((user) => user.ws === ws);
             user?.rooms.push(parsedData.roomId);
-            ws.send(`joined room: ${parsedData.roomId}`);
+            ws.send(
+                JSON.stringify({
+                    "joined room": parsedData.roomId,
+                })
+            );
         }
         if (parsedData.type === "leave-room") {
             const user = users.find((user) => user.ws === ws);
             if (!user) {
                 return;
             }
-            user.rooms = user.rooms.filter((id) => id === parsedData.roomId);
-            ws.send(`left room: ${parsedData.roomId}`);
+            user.rooms = user.rooms.filter((id) => id !== parsedData.roomId);
+            ws.send(
+                JSON.stringify({
+                    "left room": parsedData.roomId,
+                })
+            );
         }
         if (parsedData.type === "chat") {
             const roomId = parsedData.roomId;
@@ -103,13 +111,15 @@ wss.on("connection", (ws, request) => {
 
             users.forEach((user) => {
                 if (user.rooms.includes(roomId)) {
-                    user.ws.send(
-                        JSON.stringify({
-                            type: "chat",
-                            message: message,
-                            roomId,
-                        })
-                    );
+                    if (user.ws !== ws) {
+                        user.ws.send(
+                            JSON.stringify({
+                                type: "chat",
+                                message: message,
+                                roomId,
+                            })
+                        );
+                    }
                 }
             });
         }
